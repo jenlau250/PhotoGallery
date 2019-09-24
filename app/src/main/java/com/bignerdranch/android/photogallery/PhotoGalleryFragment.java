@@ -1,6 +1,8 @@
 package com.bignerdranch.android.photogallery;
 
 import android.app.DownloadManager;
+import android.app.IntentService;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -49,6 +51,9 @@ public class PhotoGalleryFragment extends Fragment {
         setHasOptionsMenu(true);
         //starts up AsyncTask that fires up background thread
         updateItems();
+
+        Intent i = PollService.newIntent(getActivity());
+        getActivity().startActivity(i);
 
         Handler responseHandler = new Handler();
         mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
