@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bignerdranch.android.photogallery.PollService.setServiceAlarm;
+
 public class PhotoGalleryFragment extends Fragment {
 
     private static final String TAG = "PhotoGalleryFragment";
@@ -52,8 +54,9 @@ public class PhotoGalleryFragment extends Fragment {
         //starts up AsyncTask that fires up background thread
         updateItems();
 
-        Intent i = PollService.newIntent(getActivity());
-        getActivity().startActivity(i);
+//        Intent i = PollService.newIntent(getActivity());
+//        getActivity().startActivity(i);
+//        setServiceAlarm(getActivity(), true);
 
         Handler responseHandler = new Handler();
         mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
@@ -116,6 +119,15 @@ public class PhotoGalleryFragment extends Fragment {
             }
         });
 
+        //Check if alarm is on and change the text of menu_item_toggle_polling to show label to user
+        MenuItem toggleItem = menu.findItem(R.id.menu_item_toggle_polling);
+        if (PollService.isServiceAlarmOn(getActivity())) {
+            toggleItem.setTitle(R.string.stop_polling);
+        } else {
+            toggleItem.setTitle(R.string.start_polling);
+        }
+
+
     }
 
     @Override
@@ -124,6 +136,11 @@ public class PhotoGalleryFragment extends Fragment {
             case R.id.menu_item_clear:
                 QueryPreferences.setStoredQuery(getActivity(), null);
                 updateItems();
+                return true;
+            case R.id.menu_item_toggle_polling:
+                boolean shouldStartAlarm = !PollService.isServiceAlarmOn(getActivity());
+                PollService.setServiceAlarm(getActivity(), shouldStartAlarm);
+                getActivity().invalidateOptionsMenu();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
